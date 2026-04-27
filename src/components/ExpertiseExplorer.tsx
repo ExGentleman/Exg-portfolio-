@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Minimize2, Bot, User, Loader2, Send, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
