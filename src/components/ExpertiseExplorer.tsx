@@ -1,30 +1,48 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Sparkles, Minimize2, Bot, User, Loader2, Send, MessageSquare } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!query.trim() || loading) return;
+export const ExpertiseExplorer: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [query, setQuery] = useState('');
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([]);
+  const [loading, setLoading] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const userMsg = query;
-  setQuery("");
-  setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-  setLoading(true);
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages, loading]);
 
-  try {
-    const response = await fetch('/api/expertise', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query: userMsg }),
-    });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim() || loading) return;
 
-    if (!response.ok) throw new Error('Failed to get response');
-    
-    const result = await response.json();
-    setMessages(prev => [...prev, { role: 'ai', text: result.answer }]);
-  } catch (error) {
-    setMessages(prev => [...prev, { role: 'ai', text: "Sorry, I'm having trouble connecting right now. Please try again later." }]);
-  } finally {
-    setLoading(false);
-  }
-};
+    const userMsg = query;
+    setQuery("");
+    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    setLoading(true);
+
+    try {
+      const response = await fetch('/api/expertise', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: userMsg }),
+      });
+
+      if (!response.ok) throw new Error('Failed to get response');
+      
+      const result = await response.json();
+      setMessages(prev => [...prev, { role: 'ai', text: result.answer }]);
+    } catch (error) {
+      setMessages(prev => [...prev, { role: 'ai', text: "Sorry, I'm having trouble connecting right now. Please try again later." }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
     <div className="fixed bottom-6 right-6 z-50">
       {isOpen ? (
         <div className="bg-card w-[90vw] sm:w-[400px] h-[500px] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden animate-in zoom-in-90 slide-in-from-bottom-5 duration-300">
@@ -85,13 +103,13 @@ const handleSubmit = async (e: React.FormEvent) => {
           onClick={() => setIsOpen(true)}
           className="w-14 h-14 rounded-full bg-primary text-white shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center group relative"
         >
-           <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full animate-ping" />
-           <MessageSquare />
-           <span className="absolute right-full mr-4 px-3 py-1 bg-card border border-border rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full animate-ping" />
+          <MessageSquare />
+          <span className="absolute right-full mr-4 px-3 py-1 bg-card border border-border rounded-lg text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
             Ask about my expertise
-           </span>
+          </span>
         </button>
       )}
     </div>
   );
-}
+};
