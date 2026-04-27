@@ -1,45 +1,30 @@
-"use client";
 
-import { useState, useRef, useEffect } from "react";
-import { exploreExpertise } from "@/ai/flows/expertise-explorer-chat-flow";
-import { MessageSquare, Send, Bot, User, Loader2, Minimize2, Sparkles } from "lucide-react";
-import { cn } from "@/lib/utils";
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!query.trim() || loading) return;
 
-export function ExpertiseExplorer() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'user' | 'ai', text: string }[]>([
-    { role: 'ai', text: "Hello! I'm the ExGentleman's AI Assistant. Ask me anything about my creator's skills, projects, or professional background!" }
-  ]);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const userMsg = query;
+  setQuery("");
+  setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+  setLoading(true);
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+  try {
+    const response = await fetch('/api/expertise', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: userMsg }),
+    });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim() || loading) return;
-
-    const userMsg = query;
-    setQuery("");
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-    setLoading(true);
-
-    try {
-      const result = await exploreExpertise({ query: userMsg });
-      setMessages(prev => [...prev, { role: 'ai', text: result.answer }]);
-    } catch (error) {
-      setMessages(prev => [...prev, { role: 'ai', text: "Sorry, I'm having trouble connecting right now. Please try again later." }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
+    if (!response.ok) throw new Error('Failed to get response');
+    
+    const result = await response.json();
+    setMessages(prev => [...prev, { role: 'ai', text: result.answer }]);
+  } catch (error) {
+    setMessages(prev => [...prev, { role: 'ai', text: "Sorry, I'm having trouble connecting right now. Please try again later." }]);
+  } finally {
+    setLoading(false);
+  }
+};
     <div className="fixed bottom-6 right-6 z-50">
       {isOpen ? (
         <div className="bg-card w-[90vw] sm:w-[400px] h-[500px] rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden animate-in zoom-in-90 slide-in-from-bottom-5 duration-300">
