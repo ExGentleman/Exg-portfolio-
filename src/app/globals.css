@@ -1,0 +1,65 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 221 14% 15%;
+    --foreground: 210 20% 98%;
+    --card: 221 14% 12%;
+    --card-foreground: 210 20% 98%;
+    --popover: 221 14% 12%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 215 71% 47%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 221 14% 20%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 221 14% 25%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 192 91% 57%;
+    --accent-foreground: 221 14% 15%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 221 14% 25%;
+    --input: 221 14% 25%;
+    --ring: 192 91% 57%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground selection:bg-accent/30;
+  }
+}
+
+.glass-morphism {
+  @apply bg-card/40 backdrop-blur-md border border-white/5;
+}
+
+.gradient-text {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary;
+}
+
+.skill-bar-animate {
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
